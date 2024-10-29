@@ -7,6 +7,7 @@
 #import asyncio
 
 
+#Comando Slash
 
 @bot.tree.command()
 @app_commands.describe(cargo="O cargo para configurar (Padrão = Everyone)")
