@@ -1,4 +1,4 @@
-#Modulos Necessarios
+#Modulos Necessários
 
 #import discord
 #from discord.ext import commands
