@@ -1,6 +1,6 @@
 # Bot de Discord em Python
 
-###Este repositório contém uma base para a criação de bots de Discord em Python, utilizando a biblioteca discord.py. 
+Este repositório contém uma base para a criação de bots de Discord em Python, utilizando a biblioteca discord.py. 
 
 ## O que você encontrará aqui:
 
