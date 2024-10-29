@@ -35,3 +35,6 @@ async def serverinfo(interaction: discord.Interaction):
     
     if interaction.guild.premium_subscription_count != 0:
         embed_serverinfo.add_field(name='Quantidade de Boosts', value=interaction.guild.premium_subscription_count)
+
+
+    await interaction.response.send_message(embed=embed_serverinfo, view=view)
