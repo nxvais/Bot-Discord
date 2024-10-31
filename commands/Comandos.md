@@ -1,4 +1,4 @@
-# Comandos em Slash
+# Comandos Slash
 
 ### Todos os comandos nesta pasta são comandos slash. Para que eles funcionem corretamente, é importante sincronizá-los com o servidor do Discord.
 
