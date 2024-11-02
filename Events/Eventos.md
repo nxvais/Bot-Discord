@@ -2,7 +2,7 @@
 
 ## Este diretório contém os eventos que o bot pode ouvir e responder.
 
-## O que são eventos?
+## O que são eventos ?
 Eventos são ações que ocorrem em um servidor Discord, como um membro entrando, uma mensagem sendo enviada, ou uma reação sendo adicionada. O bot pode "ouvir" esses eventos e executar ações em resposta.
 
 ## Exemplos de Estrutura do Código
