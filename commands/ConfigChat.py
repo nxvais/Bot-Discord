@@ -9,7 +9,7 @@
 
 #Comando Slash
 
-@bot.tree.command()
+@bot.tree.command(description="Configura o chat atual com várias opções, como trancar, destrancar, deletar e duplicar o canal.")
 @app_commands.describe(cargo="O cargo para configurar (Padrão = Everyone)")
 async def configchat(interaction: discord.Interaction, cargo:discord.Role = None):
     autor = interaction.user
