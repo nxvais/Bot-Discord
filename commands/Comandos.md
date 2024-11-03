@@ -2,7 +2,7 @@
 
 ### Todos os comandos nesta pasta são comandos slash. Para que eles funcionem corretamente, é importante sincronizá-los com o servidor do Discord.
 
-## O que são comandos slash?
+## O que são comandos slash ?
 Comandos slash são aqueles que você usa com o formato `/comando`, o que facilita a utilização e torna os comandos mais acessíveis aos usuários. Eles aparecem automaticamente como sugestões no Discord, melhorando a experiência de uso.
 
 ## Configuração Inicial e Sincronização
