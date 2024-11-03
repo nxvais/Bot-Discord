@@ -7,9 +7,7 @@
 #import asyncio
 
 
-#Comando Slash
-
-@bot.tree.command(description="Configura o chat atual com várias opções, como trancar, destrancar, deletar e duplicar o canal.")
+@bot.tree.command(description="Configura o chat com opções como trancar, destrancar, fechar, reabrir, duplicar ou deletar o canal.")
 @app_commands.describe(cargo="O cargo para configurar (Padrão = Everyone)")
 async def configchat(interaction: discord.Interaction, cargo:discord.Role = None):
     autor = interaction.user
@@ -83,17 +81,17 @@ async def configchat(interaction: discord.Interaction, cargo:discord.Role = None
 
         elif escolha == 'Duplicar':
             novo_canal = await canal.clone(name=f"{canal.name}-cópia")
-            await novo_canal.edit(position=canal.position + 1)  # Opcional: Coloca o novo canal logo abaixo do original
+            await novo_canal.edit(position=canal.position + 1)
             embedInfo.title = '🛠 - Canal Duplicado'
             embedInfo.description = f'O Canal **{canal}** foi Duplicado como **{novo_canal}** por {autor}.'
-            embedInfo.color = discord.Colour.from_hsv(0.58, 1, 1)  # Azul para indicar uma nova criação
+            embedInfo.color = discord.Colour.from_hsv(0.58, 1, 1)  # Azul
             
             await interaction.response.send_message(embed=embedInfo)
 
         elif escolha == 'Deletar':
             embedInfo.title = '🛠 - Canal Deletado'
             embedInfo.description = f'O canal **{canal}** será permanentemente deletado em 5 segundos por {autor}.'
-            embedInfo.color = discord.Colour.from_hsv(1, 1, 1)  # Cinza para indicar exclusão
+            embedInfo.color = discord.Colour.from_hsv(1, 1, 1)  # Cinza
             
             await interaction.response.send_message(embed=embedInfo)
             
