@@ -3,177 +3,206 @@
 # from discord.ext import commands
 # from discord.ui import Button, View, Select, Modal, TextInput
 
+@bot.tree.command(name='criarembed', description='Cria uma embed personalizada para ser enviada no servidor.')
+async def criarembed(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message('Você não tem a permissão de **ADMINISTRADOR** para utilizar esse Comando.', ephemeral=True)
+        return
+        
+    embedPadrão = discord.Embed(title='Personalize Sua Embed', description='Edite os parametros abaixo que desejar.', color=discord.Colour.from_rgb(255, 255, 255))
+    
+    BotãoTitulo = Button(label='Titulo', style=discord.ButtonStyle.primary, emoji='📝')
+    BotãoDescricao = Button(label='Descrição', style=discord.ButtonStyle.primary, emoji='📝')
+    BotãoCor = Button(label='Cor', style=discord.ButtonStyle.primary, emoji='🎨')
+    BotãoAutor = Button(label='Autor', style=discord.ButtonStyle.primary, emoji='👤')
+    BotãoImagemThumb = Button(label='Imagem e Thumbnail', style=discord.ButtonStyle.primary, emoji='📸')
+    BotãoRodapé = Button(label='Rodapé', style=discord.ButtonStyle.primary, emoji='📝')
+    BotãoExportar = Button(label='Exportar Json', style=discord.ButtonStyle.secondary, emoji='📝')
+    BotãoImportar = Button(label='Importar Json', style=discord.ButtonStyle.secondary, emoji='📝')
+    BotãoEnviar = Button(label='Enviar Embed', style=discord.ButtonStyle.success, emoji='✉️')
+    
+    viewEmbed = View(timeout=None)
+    viewEmbed.add_item(BotãoTitulo)
+    viewEmbed.add_item(BotãoDescricao)
+    viewEmbed.add_item(BotãoCor)
+    viewEmbed.add_item(BotãoAutor)
+    viewEmbed.add_item(BotãoImagemThumb)
+    viewEmbed.add_item(BotãoRodapé)
+    viewEmbed.add_item(BotãoExportar)
+    viewEmbed.add_item(BotãoImportar)
+    viewEmbed.add_item(BotãoEnviar)
+    
+    await interaction.response.send_message(embed=embedPadrão, view=viewEmbed, ephemeral=True)
+    
+    embed_states = {}
+    
+    def get_embed(interaction):
+        if interaction.message.id not in embed_states:
+            embed_states[interaction.message.id] = discord.Embed(
+                title="Personalize Sua Embed",
+                description="Edite os parâmetros abaixo que desejar.",
+                color=discord.Color.blue()
+            )
+        return embed_states[interaction.message.id]
 
-
-@bot.tree.command(description='Abre um Painel de Criação de Embed')
-async def criarembed(interact: discord.Interaction):
-    embed_criador = discord.Embed(title='Esse é o seu Embed')
-    embed_criador.description = 'Você pode editar cada elemento, clique nos Botões e Digite os Valores.'
-    embed_criador.set_footer(text='Rodapé/Footer (Opcional)')
+    # Função para definir a embed atualizada
+    def set_embed(interaction, embed):
+        embed_states[interaction.message.id] = embed
     
-    embed_final = discord.Embed(title='Você não definiu um titulo...')
-    
-    botaoTitulo = Button(label='Titulo', style=discord.ButtonStyle.secondary)
-    botaoDescr = Button(label='Descrição', style=discord.ButtonStyle.secondary)
-    botaoFooter = Button(label='Footer', style=discord.ButtonStyle.secondary)
-    botaoImagem = Button(label='Imagem', style=discord.ButtonStyle.secondary)
-    botaoThumb = Button(label='Thumbnail', style=discord.ButtonStyle.secondary)
-    botaoFinalizar = Button(label='Concluir', style=discord.ButtonStyle.success)
-    
-    SelectMenuCor = Select(placeholder='Selecione uma Cor')
-    opçoes = [discord.SelectOption(label='Vermelho', value='1'), 
-              discord.SelectOption(label='Azul', value='2'),
-              discord.SelectOption(label='Verde', value='3'),
-              discord.SelectOption(label='Amarelo', value='4'),
-              discord.SelectOption(label='Branco', value='5'),
-              discord.SelectOption(label='Preto', value='6'),
-              discord.SelectOption(label='Escolher Cor Hexadecimal', value='7')]
-    SelectMenuCor.options = opçoes
-    
-    
-    view = View()
-    view.add_item(botaoTitulo)
-    view.add_item(botaoDescr)
-    view.add_item(botaoFooter)
-    view.add_item(botaoImagem)
-    view.add_item(botaoThumb)
-    view.add_item(SelectMenuCor)
-    view.add_item(botaoFinalizar)
-    
-    await interact.response.send_message(embed=embed_criador, view=view, ephemeral=True)
-    
-    async def botaoTitulo_callback(interaction):
-        FormTitulo = Modal(title='Titulo do Embed')
-        TituloSet = TextInput(label='Titulo', max_length=256, min_length=1, placeholder='Esse é o seu Titulo',required=True)
-        FormTitulo.add_item(TituloSet)
+    async def titulo_callback(interaction):
+        ModalTitulo = Modal(title='Digite o Titulo da Embed')
+        InputTitulo = TextInput(label='Digite o Titulo', placeholder='Digite o Titulo', style=discord.TextStyle.short, required=False)
         
-        async def on_submit_Titulo(interaction: discord.Interaction):
-            embed_final.title = f'{TituloSet}'
-            embed_criador.title = f'{TituloSet}'
-            await interaction.response.edit_message(embed=embed_criador)
-            await interaction.followup.send(f'Você setou o **Titulo** do Embed para "{TituloSet}"', ephemeral=True)
+        ModalTitulo.add_item(InputTitulo)
         
-        FormTitulo.on_submit = on_submit_Titulo
-        await interaction.response.send_modal(FormTitulo)
-        
-        
-        
-        
-    async def botaoDescr_callback(interaction):
-        FormDescr = Modal(title='Descrição do Embed')
-        DescrSet = TextInput(label='Descrição', max_length=4000, min_length=1, placeholder='Essa é a Minha Descrição, Ok ?',style=discord.TextStyle.long, required=True)
-        FormDescr.add_item(DescrSet)
-        
-        async def on_submit_Descr(interaction: discord.Interaction):
-            embed_criador.description = f'{DescrSet}'
-            embed_final.description = f'{DescrSet}'
-            await interaction.response.edit_message(embed=embed_criador)
-            await interaction.followup.send(f'Você setou a **Descrição** do Embed para "{DescrSet}"', ephemeral=True)
-        
-        FormDescr.on_submit = on_submit_Descr
-        await interaction.response.send_modal(FormDescr)
-        
-        
-        
-        
-    async def botaoFooter_callback(interaction):
-        FormFooter = Modal(title='Rodapé do Embed')
-        FooterSet = TextInput(label='Rodapé/Footer', max_length=2048, min_length=1, placeholder='Rodapé... apenas isso',required=False)
-        FormFooter.add_item(FooterSet)
-        
-        async def on_submit_Footer(interaction: discord.Interaction):
-            if FooterSet.value != None:
-                embed_criador.set_footer(text=f'{FooterSet}')
-                embed_final.set_footer(text=f'{FooterSet}')
-                await interaction.response.edit_message(embed=embed_criador)
-                await interaction.followup.send(f'Você setou o **Rodapé** do Embed para "{FooterSet}"', ephemeral=True)
-        
-        FormFooter.on_submit = on_submit_Footer
-        await interaction.response.send_modal(FormFooter)
-        
-        
-    async def botaoImagem_callback(interaction):
-        FormImg = Modal(title='Imagem do Embed (URL)')
-        ImgSet = TextInput(label='URL', max_length=4000, min_length=1, placeholder='https://www.ImagemMuitoDahora.novais.com.br',required=False)
-        FormImg.add_item(ImgSet)
-        
-        async def on_submit_image(interaction: discord.Interaction):
-            if ImgSet.value:
-                embed_criador.set_image(url=ImgSet.value)
-                embed_final.set_image(url=ImgSet.value)
-                await interaction.response.edit_message(embed=embed_criador)
-        
-        FormImg.on_submit = on_submit_image
-        await interaction.response.send_modal(FormImg)
-        
-        
-    async def botaoThumb_callback(interaction):
-        FormThumb = Modal(title='Thumbnail do Embed (URL)')
-        ThumbSet = TextInput(label='URL', max_length=4000, min_length=1, placeholder='https://www.ThumbnailMuitoDahora.Novais.com.br',required=False)
-        FormThumb.add_item(ThumbSet)
-        
-        async def on_submit_thumb(interaction: discord.Interaction):
-            if ThumbSet.value:
-                embed_criador.set_thumbnail(url=ThumbSet.value)
-                embed_final.set_thumbnail(url=ThumbSet.value)
-                await interaction.response.edit_message(embed=embed_criador)
-        
-        FormThumb.on_submit = on_submit_thumb
-        await interaction.response.send_modal(FormThumb)
-        
-        
-    async def Select_Cores(interaction: discord.Interaction):
-        escolha = interaction.data['values'][0]
-        
-        cores = {
-        '1': (discord.Colour.red(), 'Vermelho'), #Vermelho
-        '2': (discord.Colour.blue(), 'Azul'), #Azul
-        '3': (discord.Colour.green(), 'Verde'), #Verde
-        '4': (discord.Colour.gold(), 'Amarelo'),  # Amarelo
-        '5': (discord.Colour.from_rgb(255, 255, 255), 'Branco'),  # Branco
-        '6': (discord.Colour.from_rgb(0, 0, 0), 'Preto')  # Preto
-        }
-
-        # Define a cor com base na escolha
-        if escolha in cores:
-            embed_final.color, cor_nome = cores[escolha]
-            embed_criador.color = embed_final.color
-            await interaction.response.edit_message(embed=embed_criador)
-            await interaction.followup.send(f'Você setou a **Cor** do Embed para "{cor_nome}"', ephemeral=True)
-
-    
+        async def on_submit_titulo(interaction):
+            embedPadrão = get_embed(interaction)
+            embedPadrão.title = InputTitulo.value
+            set_embed(interaction, embedPadrão)
+            await interaction.response.edit_message(embed=embedPadrão, view=viewEmbed)
             
-        elif escolha == '7': #Hexadecimal
-            FormHex = Modal(title='Sistema de Cores no Embed')
-            Hexadecimal = TextInput(label='Cor em HEX', placeholder="FF0000", min_length=6, max_length=6, required=True)
-            FormHex.add_item(Hexadecimal)
-
-            async def on_submit_Hex(interaction: discord.Interaction):
-                Cor = Hexadecimal.value  # Pega o valor do campo de entrada
-                ValorCor = int(Cor, 16)
-                embed_final.color = ValorCor
-                embed_criador.color = ValorCor
-                await interaction.response.edit_message(embed=embed_criador)
-                await interaction.followup.send(f'Você setou a **Cor** do Embed para "{Cor}"', ephemeral=True)
-                
-            FormHex.on_submit = on_submit_Hex
-            await interaction.response.send_modal(FormHex)
+        ModalTitulo.on_submit = on_submit_titulo
+        await interaction.response.send_modal(ModalTitulo)
+        
+    BotãoTitulo.callback = titulo_callback
+    
+    async def descricao_callback(interaction):
+        ModalDescricao = Modal(title='Digite a Descricao da Embed')
+        InputDescricao = TextInput(label='Digite a Descricao', placeholder='Digite a Descricao', style=discord.TextStyle.short, required=False)
+        
+        ModalDescricao.add_item(InputDescricao)
+        
+        async def on_submit_descricao(interaction):
+            embedPadrão = get_embed(interaction)
+            embedPadrão.description = InputDescricao.value
+            set_embed(interaction, embedPadrão)
+            await interaction.response.edit_message(embed=embedPadrão, view=viewEmbed)
             
+        ModalDescricao.on_submit = on_submit_descricao
+        await interaction.response.send_modal(ModalDescricao)
         
+    BotãoDescricao.callback = descricao_callback
+    
+    async def cor_callback(interaction):
+        ModalCor = Modal(title='Digite a Cor da Embed')
+        InputCor = TextInput(label='Digite a Cor', placeholder='Digite a Cor', style=discord.TextStyle.short, required=False)
         
+        ModalCor.add_item(InputCor)
         
+        async def on_submit_cor(interaction):
+            embedPadrão = get_embed(interaction)
+            embedPadrão.color = discord.Colour.from_rgb(int(InputCor.value[0:2], 16), int(InputCor.value[2:4], 16), int(InputCor.value[4:6], 16))
+            set_embed(interaction, embedPadrão)
+            await interaction.response.edit_message(embed=embedPadrão, view=viewEmbed)
+            
+        ModalCor.on_submit = on_submit_cor
+        await interaction.response.send_modal(ModalCor)
         
-    async def botaoFinalizar_callback(interaction):
-        await interaction.channel.send(embed=embed_final)
-        await interaction.response.send_message('O seu Embed foi Finalizado com Sucesso!', ephemeral=True)
+    BotãoCor.callback = cor_callback
+    
+    async def autor_callback(interaction):
+        ModalAutor = Modal(title='Digite o Autor da Embed')
+        TextAutor = TextInput(label='Digite o Texto do Autor', placeholder='Digite o Autor', style=discord.TextStyle.short, required=False)
+        UrlAutor = TextInput(label='Digite a URL do Autor', placeholder='Digite a URL do Autor', style=discord.TextStyle.short, required=False)
+        
+        ModalAutor.add_item(TextAutor)
+        ModalAutor.add_item(UrlAutor)
+        
+        async def on_submit_autor(interaction):
+            embedPadrão = get_embed(interaction)
+            embedPadrão.set_author(name=TextAutor.value)
+            if UrlAutor.value:
+                embedPadrão.set_author(url=UrlAutor.value)
+            set_embed(interaction, embedPadrão)
+            await interaction.response.edit_message(embed=embedPadrão, view=viewEmbed)
+            
+        ModalAutor.on_submit = on_submit_autor
+        await interaction.response.send_modal(ModalAutor)
+        
+    BotãoAutor.callback = autor_callback
+    
+    async def imagemANDthumb_callback(interaction):
+        ModalImagem = Modal(title='Digite as Imagens da Embed')
+        InputImagem = TextInput(label='Digite a URL da Imagem', placeholder='Digite a URL da Imagem', style=discord.TextStyle.short, required=False)
+        InputThumb = TextInput(label='Digite a URL da Thumbnail', placeholder='Digite a URL da Thumbnail', style=discord.TextStyle.short, required=False)
+        
+        ModalImagem.add_item(InputImagem)
+        ModalImagem.add_item(InputThumb)
+        
+        async def on_submit_imagem(interaction):
+            embedPadrão = get_embed(interaction)
+            if InputImagem.value:
+                embedPadrão.set_image(url=InputImagem.value)
+            if InputThumb.value:
+                embedPadrão.set_thumbnail(url=InputThumb.value)
+            set_embed(interaction, embedPadrão)
+            await interaction.response.edit_message(embed=embedPadrão, view=viewEmbed)
+            
+        ModalImagem.on_submit = on_submit_imagem
+        await interaction.response.send_modal(ModalImagem)
+        
+    BotãoImagemThumb.callback = imagemANDthumb_callback
+        
+    async def rodapé_callback(interaction):
+        ModalRodapé = Modal(title='Digite o Rodapé da Embed')
+        InputRodapé = TextInput(label='Digite o Texto do Rodapé', placeholder='Digite o Texto do Rodapé', style=discord.TextStyle.short, required=False)
+        
+        ModalRodapé.add_item(InputRodapé)
+        
+        async def on_submit_rodapé(interaction):
+            embedPadrão = get_embed(interaction)
+            embedPadrão.set_footer(text=InputRodapé.value)
+            set_embed(interaction, embedPadrão)
+            await interaction.response.edit_message(embed=embedPadrão, view=viewEmbed)
+            
+        ModalRodapé.on_submit = on_submit_rodapé
+        await interaction.response.send_modal(ModalRodapé)
+        
+    BotãoRodapé.callback = rodapé_callback
+    
+    async def exportar_callback(interaction): 
+        jsonEmbed = json.dumps(embedPadrão.to_dict())
+        await interaction.response.send_message(jsonEmbed, ephemeral=True)
+        
+    BotãoExportar.callback = exportar_callback
+    
+    async def importar_callback(interaction):
+        ModalImportar = Modal(title="Importar JSON")
+        InputImportar = TextInput(
+            label="Importar JSON",
+            placeholder="Cole o JSON aqui",
+            style=discord.TextStyle.long,
+            required=True,
+        )
+        ModalImportar.add_item(InputImportar)
 
-        
+        async def on_submit_importar(interaction):
+            try:
+                jsonEmbed = json.loads(InputImportar.value)
+                embed = discord.Embed.from_dict(jsonEmbed)
+                set_embed(interaction, embed)
+                await interaction.response.edit_message(embed=embed, view=viewEmbed)
+            except Exception as e:
+                await interaction.response.send_message(
+                    f"Erro ao importar JSON: {e}", ephemeral=True
+                )
 
+        ModalImportar.on_submit = on_submit_importar
+        await interaction.response.send_modal(ModalImportar)
+
+    BotãoImportar.callback = importar_callback
+    
+    async def enviar_callback(interaction):
+        embedPadrão = get_embed(interaction)
+        if embedPadrão.title == 'Personalize Sua Embed':
+            await interaction.response.send_message('Você não editou o Titulo da Embed', ephemeral=True)
+            return
+        elif embedPadrão.description == 'Edite os parametros abaixo que desejar.':
+            await interaction.response.send_message(' você não editou a Descricao da Embed', ephemeral=True)
+            return
         
-    botaoTitulo.callback = botaoTitulo_callback
-    botaoDescr.callback = botaoDescr_callback
-    botaoFooter.callback = botaoFooter_callback
-    botaoImagem.callback = botaoImagem_callback
-    botaoThumb.callback = botaoThumb_callback
-    botaoFinalizar.callback = botaoFinalizar_callback
-    SelectMenuCor.callback = Select_Cores
+        channel = interaction.channel
+        await channel.send(embed=embedPadrão)
+        await interaction.response.send_message('Embed Enviado', ephemeral=True)
+    
+    BotãoEnviar.callback = enviar_callback
